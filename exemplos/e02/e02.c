@@ -26,7 +26,8 @@
  *  @param
  *    t0: tempo inicial
  *    tf: tempo final
- *    u0: valor inicial
+ *    u0: valor inicial para u
+ *    v0: valor inicial para v
  *    h : passo (opcional; default 1e-3)
  *
  * 
@@ -39,8 +40,8 @@
  *    - biblioteca gráfica gnuplot (através de um pipe)
  * 
  * 
- *  compilar com 'gcc -g e01.c -o e01 -lm -Wall'
- *  executar com './e01 t0 tf u0' ou com './e01 t0 tf u0 h'
+ *  compilar com 'gcc -g e02.c -o e02 -lm -Wall'
+ *  executar com './e02 t0 tf u0 v0' ou com './e02 t0 tf u0 v0 h'
  * 
  * 
  *  obs. 1: arquivos tasks.json e launch.json para compilação e
@@ -138,6 +139,7 @@ int main(int argc, char *argv[])
   if (u == NULL)
     {
       printf("erro: não foi possível alocar memória para u[]\n");
+      free(t);
       exit(-1);
     }
   u[0] = u0;
@@ -146,6 +148,8 @@ int main(int argc, char *argv[])
   if (v == NULL)
     {
       printf("erro: não foi possível alocar memória para v[]\n");
+      free(t);
+      free(u);
       exit(-1);
     }
   v[0] = v0;
@@ -184,6 +188,9 @@ int main(int argc, char *argv[])
   if ( (outfp = fopen("e02.dat","w+b") ) == NULL )
     {
       printf("erro: não foi possível criar o arquivo e01.dat\n");
+      free(t);
+      free(u);
+      free(v);
       exit(1);
     }
   else
@@ -194,6 +201,9 @@ int main(int argc, char *argv[])
           fprintf(outfp, "%e\t%e\t%e\n", t[n], u[n], v[n]);
         }
       fclose(outfp);
+      free(t);
+      free(u);
+      free(v);
 
       if ( (pltpip = popen("gnuplot -persist", "w") ) == NULL )
         {

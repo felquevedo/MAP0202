@@ -122,6 +122,7 @@ int main(int argc, char *argv[])
   if (u == NULL)
     {
       printf("erro: não foi possível alocar memória para u[]\n");
+      free(t);
       exit(-1);
     }
   u[0] = u0;
@@ -157,6 +158,8 @@ int main(int argc, char *argv[])
   if ( (outfp = fopen("e01.dat","w+b") ) == NULL )
     {
       printf("erro: não foi possível criar o arquivo e01.dat\n");
+      free(t);
+      free(u);
       exit(1);
     }
   else
@@ -166,6 +169,8 @@ int main(int argc, char *argv[])
           fprintf(outfp, "%e\t%e\n", t[n], u[n]);
         }
       fclose(outfp);
+      free(t);
+      free(u);
 
       if ( (pltpip = popen("gnuplot -persist", "w") ) == NULL )
         {
