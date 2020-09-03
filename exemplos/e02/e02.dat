@@ -1,4 +1,29 @@
-# t  u  v
+# Saída de dados
+#
+#	Exemplo 02: Solução do P.V.I.
+#
+#		du/dt = f(t,u(t),v(t)) ,
+#
+#		dv/dt = g(t,u(t),v(t)) ,
+#
+#		f(t,u,v) = (1 + exp(-t)) * u*v / (1 + u*v*v)
+#
+#		g(t,u,v) = v/u
+#
+#		u(t0) = u0 ,  v(t0) = v0
+#
+#	pelo método de Euler com passo uniforme.
+#
+#
+#	! tempo inicial         t0 = 0.000000e+00
+#	! tempo final           tf = 1.000000e+01
+#	! valor inicial para u  u0 = 1.000000e+00
+#	! valor inicial para v  v0 = 5.000000e-01
+#
+#	! passo utilizado  h  = 1.000000e-03
+#	! numero de pontos nt = 10001
+#
+# t		u		v
 0.000000e+00	1.000000e+00	5.000000e-01
 1.000000e-03	1.000800e+00	5.005000e-01
 2.000000e-03	1.001601e+00	5.010001e-01

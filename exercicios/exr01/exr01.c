@@ -1,5 +1,5 @@
 /* *************************************************************
- *  exemplos/e01/e01.c
+ *  exercicios/exr01/exr01.c
  * 
  *  autor: G. F. Fornel <guilherme.fornel@ufrgs.br>
  * 
@@ -9,7 +9,7 @@
  * 
  *  MAP0202 - Métodos Numéricos para Eq. Diferenciais
  * 
- *  Exemplo 01: Solução do P.V.I.
+ *  Exercício 01: Solução do P.V.I.
  * 
  *    du/dt = f(t,u(t)) ,
  * 
@@ -17,13 +17,13 @@
  * 
  *    u(t0) = u0
  * 
- *    pelo método de Euler com passo uniforme.
+ *    pelo método de Runge-Kutta RK2 com passo uniforme.
  * 
  *  @param
  *    t0: tempo inicial
  *    tf: tempo final
  *    u0: valor inicial
- *    h : passo (opcional; default 1e-3)
+ *    h : passo (opcional; default 1e-2)
  *
  * 
  *  sistema: Linux (recomendável Ubuntu 20.04LTS ou Mint 20)
@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
   printf("\t\tdu/dt = f(t,u(t)) ,\n\n");
   printf("\t\tf(t,u) = (1 + exp(-t)) * u*u / (1 + u*u*u*u)\n\n");
   printf("\t\tu(t0) = u0\n\n");
-  printf("\tpelo método de Euler com passo uniforme.\n\n\n");
+  printf("\tpelo método de Runge-Kutta RK2 com passo uniforme.\n\n\n");
   printf("(pressione ENTER para continuar...)\n\n");
   getchar();
 
@@ -78,14 +78,14 @@ int main(int argc, char *argv[])
       printf("t0: tempo inicial\n");
       printf("tf: tempo final\n");
       printf("u0: valor inicial\n");
-      printf("h : passo (opcional; default 1e-3)\n");
+      printf("h : passo (opcional; default 1e-2)\n");
       exit(-1);
     }
 
   double t0 = atof(argv[1]);
   double tf = atof(argv[2]);
   double u0 = atof(argv[3]);
-  double h = 1e-3;
+  double h = 1e-2;
   if (argc > 4) h = atof(argv[4]);
 
   size_t nt = ceil( (tf - t0) / h ) + 1; /* dimensão dos arranjos */
@@ -131,14 +131,16 @@ int main(int argc, char *argv[])
     printf("\t+ Avançando no tempo...\n\n");
   #endif
 
-  /* Loop de Euler */
+  /* Loop do Runge-Kutta RK2 */ 
   for (size_t n = 1; n < nt; n++)
     {
       #if VERBOSE == 1
         if (n % (nt/VERB_STEP) == 0)
           printf("\tn = %ld\n", n);
       #endif
-      u[n] = u[n-1] + h * f(t[n-1], u[n-1]);
+      double k1n = h * f(t[n-1], u[n-1]);
+      double k2n = h * f(t[n-1] + 0.5*h, u[n-1] + 0.5*k1n);
+      u[n] = u[n-1] + k2n;
     }
 
   #if VERBOSE == 1
@@ -156,7 +158,7 @@ int main(int argc, char *argv[])
   FILE *outfp;
   FILE *pltpip;
 
-  if ( (outfp = fopen("e01.dat","w+b") ) == NULL )
+  if ( (outfp = fopen("exr01.dat","w+b") ) == NULL )
     {
       printf("erro: não foi possível criar o arquivo e01.dat\n");
       free(t);
@@ -166,11 +168,11 @@ int main(int argc, char *argv[])
   else
     {
       fprintf(outfp, "# Saída de dados\n#\n");
-      fprintf(outfp, "#\tExemplo 01: Solução do P.V.I.\n#\n");
+      fprintf(outfp, "#\tExercício 01: Solução do P.V.I.\n#\n");
       fprintf(outfp, "#\t\tdu/dt = f(t,u(t)) ,\n#\n");
       fprintf(outfp, "#\t\tf(t,u) = (1 + exp(-t)) * u*u / (1 + u*u*u*u)\n#\n");
       fprintf(outfp, "#\t\tu(t0) = u0\n#\n");
-      fprintf(outfp, "#\tpelo método de Euler com passo uniforme.\n#\n#\n");
+      fprintf(outfp, "#\tpelo método de Runge-Kutta RK2 com passo uniforme.\n#\n#\n");
       fprintf(outfp, "#\t! tempo inicial    t0 = %e\n", t0);
       fprintf(outfp, "#\t! tempo final      tf = %e\n", tf);
       fprintf(outfp, "#\t! valor inicial    u0 = %e\n#\n", u0);
@@ -191,9 +193,9 @@ int main(int argc, char *argv[])
         }
       else
         {
-          fprintf(pltpip, "set title \'e01.dat\' font \',10\'\n");
+          fprintf(pltpip, "set title \'exr01.dat\' font \',10\'\n");
           fprintf(pltpip, "set style data lines\n");
-          fprintf(pltpip, "plot 'e01.dat'\n");
+          fprintf(pltpip, "plot 'exr01.dat'\n");
           pclose(pltpip);
         }
     }

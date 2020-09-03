@@ -1,5 +1,5 @@
 /* *************************************************************
- *  exemplos/e02/e02.c
+ *  exercicios/exr02/exr02.c
  * 
  *  autor: G. F. Fornel <guilherme.fornel@ufrgs.br>
  * 
@@ -9,7 +9,7 @@
  * 
  *  MAP0202 - Métodos Numéricos para Eq. Diferenciais
  * 
- *  Exemplo 02: Solução do P.V.I.
+ *  Exercício 02: Solução do P.V.I.
  * 
  *    du/dt = f(t,u(t),v(t)) ,
  * 
@@ -21,14 +21,14 @@
  * 
  *    u(t0) = u0 , v(t0) = v0
  * 
- *    pelo método de Euler com passo uniforme.
+ *    pelo método de Runge-Kutta RK2 com passo uniforme.
  * 
  *  @param
  *    t0: tempo inicial
  *    tf: tempo final
  *    u0: valor inicial para u
  *    v0: valor inicial para v
- *    h : passo (opcional; default 1e-3)
+ *    h : passo (opcional; default 1e-2)
  *
  * 
  *  sistema: Linux (recomendável Ubuntu 20.04LTS ou Mint 20)
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   printf("\t\tf(t,u,v) = (1 + exp(-t)) * u*v / (1 + u*v*v)\n\n");
   printf("\t\tg(t,u,v) = v/u\n\n");
   printf("\t\tu(t0) = u0 ,  v(t0) = v0\n\n");
-  printf("\tpelo método de Euler com passo uniforme.\n\n\n");
+  printf("\tpelo método de Runge-Kutta RK2 com passo uniforme.\n\n\n");
   printf("(pressione ENTER para continuar...)\n\n");
   getchar();
 
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
       printf("tf: tempo final\n");
       printf("u0: valor inicial para u\n");
       printf("v0: valor inicial para v\n");
-      printf("h : passo (opcional; default 1e-3)\n");
+      printf("h : passo (opcional; default 1e-2)\n");
       exit(-1);
     }
 
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
   double tf = atof(argv[2]);
   double u0 = atof(argv[3]);
   double v0 = atof(argv[4]);
-  double h = 1e-3;
+  double h = 1e-2;
   if (argc > 5) h = atof(argv[5]);
 
   size_t nt = ceil( (tf - t0) / h ) + 1; /* dimensão dos arranjos */
@@ -158,14 +158,18 @@ int main(int argc, char *argv[])
     printf("\t+ Avançando no tempo...\n\n");
   #endif
 
-  /* Loop de Euler */
+  /* Loop do Runge-Kutta RK2 */ 
   for (size_t n = 1; n < nt; n++)
     {
       #if VERBOSE == 1
         if (n % (nt/VERB_STEP) == 0) printf("\tn = %ld\n", n);
       #endif
-      u[n] = u[n-1] + h * f(t[n-1], u[n-1], v[n-1]);
-      v[n] = v[n-1] + h * g(t[n-1], u[n-1], v[n-1]);
+      double ku1n = h * f(t[n-1], u[n-1], v[n-1]);
+      double kv1n = h * g(t[n-1], u[n-1], v[n-1]);
+      double ku2n = h * f(t[n-1] + 0.5*h, u[n-1] + 0.5*ku1n, v[n-1] + 0.5*kv1n);
+      double kv2n = h * g(t[n-1] + 0.5*h, u[n-1] + 0.5*ku1n, v[n-1] + 0.5*kv1n);
+      u[n] = u[n-1] + ku2n;
+      v[n] = v[n-1] + kv2n;
     }
 
   #if VERBOSE == 1
@@ -186,7 +190,7 @@ int main(int argc, char *argv[])
   FILE *outfp;
   FILE *pltpip;
 
-  if ( (outfp = fopen("e02.dat","w+b") ) == NULL )
+  if ( (outfp = fopen("exr02.dat","w+b") ) == NULL )
     {
       printf("erro: não foi possível criar o arquivo e01.dat\n");
       free(t);
@@ -197,13 +201,13 @@ int main(int argc, char *argv[])
   else
     {
       fprintf(outfp, "# Saída de dados\n#\n");
-      fprintf(outfp, "#\tExemplo 02: Solução do P.V.I.\n#\n");
+      fprintf(outfp, "#\tExercício 02: Solução do P.V.I.\n#\n");
       fprintf(outfp, "#\t\tdu/dt = f(t,u(t),v(t)) ,\n#\n");
       fprintf(outfp, "#\t\tdv/dt = g(t,u(t),v(t)) ,\n#\n");
       fprintf(outfp, "#\t\tf(t,u,v) = (1 + exp(-t)) * u*v / (1 + u*v*v)\n#\n");
       fprintf(outfp, "#\t\tg(t,u,v) = v/u\n#\n");
       fprintf(outfp, "#\t\tu(t0) = u0 ,  v(t0) = v0\n#\n");
-      fprintf(outfp, "#\tpelo método de Euler com passo uniforme.\n#\n#\n");
+      fprintf(outfp, "#\tpelo método de Runge-Kutta RK2 com passo uniforme.\n#\n#\n");
       fprintf(outfp, "#\t! tempo inicial         t0 = %e\n", t0);
       fprintf(outfp, "#\t! tempo final           tf = %e\n", tf);
       fprintf(outfp, "#\t! valor inicial para u  u0 = %e\n", u0);
@@ -226,10 +230,10 @@ int main(int argc, char *argv[])
         }
       else
         {
-          fprintf(pltpip, "set title \'e02.dat\' font \',10\'\n");
+          fprintf(pltpip, "set title \'exr02.dat\' font \',10\'\n");
           fprintf(pltpip, "set style data lines\n");
           fprintf(pltpip, "set xlabel 't'\n");
-          fprintf(pltpip, "plot 'e02.dat' using 1:2 title 'u(t)' with lines, "
+          fprintf(pltpip, "plot 'exr02.dat' using 1:2 title 'u(t)' with lines, "
                           " '' using 1:3 title 'v(t)' with lines \n");
           pclose(pltpip);
         }
